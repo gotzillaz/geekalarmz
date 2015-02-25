@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
@@ -93,6 +94,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             Toast.makeText(this, "SWITCH "+isChecked, Toast.LENGTH_SHORT).show();
             if(isChecked) {
                 mMediaPlayer.start();
+                Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate for 500 milliseconds
+                v.vibrate(500);
             }
             else {
                 mMediaPlayer.pause();
