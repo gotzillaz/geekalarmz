@@ -1,30 +1,55 @@
 package net.kodyx.gotzillaz.geekalarmz;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import java.util.Calendar;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener{
 
-    TextView mTimeTextView;
-    SwitchCompat mEnableSwitch;
-    CheckBox mVibrateCheckBox;
+    private TextView mTimeTextView;
+    private SwitchCompat mEnableSwitch;
+    private CheckBox mVibrateCheckBox;
+    private Context mContext;
+    private TimePickerDialog mTimePickerDialog;
+    public int hour = 0;
+    public int minute = 0;
+
+    TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDaySet, int minuteSet) {
+            hour = hourOfDaySet;
+            minute = minuteSet;
+            mTimeTextView.setText(String.format("%02d:%02d", hour, minute));
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mContext = getApplicationContext();
         mTimeTextView = (TextView) findViewById(R.id.text_time);
         mEnableSwitch = (SwitchCompat) findViewById(R.id.switch_enable);
         mVibrateCheckBox = (CheckBox) findViewById(R.id.checkbox_vibrate);
-    }
 
+        mTimeTextView.setOnClickListener(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -46,5 +71,33 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.text_time) {
+            DialogFragment newFragment = new TimePickerFragment(mTimeSetListener);
+            newFragment.show(getFragmentManager(), "timePicker");
+        }
+    }
+
+    public static class TimePickerFragment extends DialogFragment {
+        TimePickerDialog.OnTimeSetListener listener;
+
+        public TimePickerFragment(TimePickerDialog.OnTimeSetListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this.listener, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
     }
 }
