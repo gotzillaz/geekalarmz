@@ -1,5 +1,10 @@
 package net.kodyx.gotzillaz.geekalarmz;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,9 +23,18 @@ import java.util.Calendar;
 
 public class AlarmActivity extends ActionBarActivity {
 
-    Button mSubmitButton;
-    EditText mAnswerText;
-    String weekDay;
+    private Button mSubmitButton;
+    private EditText mAnswerEditText;
+    private TextView mTimeTextView;
+    private String weekDay;
+    private int hour;
+    private int minute;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private MediaPlayer mMediaPlayer;
+    private Handler mHandler;
+    private Runnable mVibrateRun;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +42,33 @@ public class AlarmActivity extends ActionBarActivity {
         setContentView(R.layout.activity_alarm);
 
         mSubmitButton = (Button) findViewById(R.id.button_submit);
-        mAnswerText = (EditText) findViewById(R.id.edit_text_answer);
+        mAnswerEditText = (EditText) findViewById(R.id.edit_text_answer);
+        mTimeTextView = (TextView) findViewById(R.id.text_time);
+
+        mSharedPreferences = getSharedPreferences("alarm", Context.MODE_PRIVATE);
+
+        hour = mSharedPreferences.getInt("hour", 0);
+        minute = mSharedPreferences.getInt("minute", 0);
+        mTimeTextView.setText(String.format("%02d:%02d", hour, minute));
+
+        mMediaPlayer = MediaPlayer.create(this, R.raw.massive_war_alarm);
+        mMediaPlayer.setLooping(true);
+        mMediaPlayer.start();
+
+        mContext = getApplicationContext();
+
+        mHandler = new Handler();
+
+        mVibrateRun = new Runnable() {
+            @Override
+            public void run() {
+                Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(1000);
+                mHandler.postDelayed(mVibrateRun, 2000);
+            }
+        };
+
+        mVibrateRun.run();
 
         Window win = getWindow();
         win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
@@ -46,8 +86,11 @@ public class AlarmActivity extends ActionBarActivity {
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mAnswerText.getText().toString().toLowerCase().equals(weekDay.toLowerCase())) {
+                if(mAnswerEditText.getText().toString().toLowerCase().equals(weekDay.toLowerCase())) {
                     Toast.makeText(AlarmActivity.this, "Correct Answer !!", Toast.LENGTH_SHORT).show();
+                    mMediaPlayer.pause();
+                    mHandler.removeCallbacks(mVibrateRun);
+                    finish();
                 }
                 else {
                     Toast.makeText(AlarmActivity.this, "Incorrect Answer !!", Toast.LENGTH_SHORT).show();

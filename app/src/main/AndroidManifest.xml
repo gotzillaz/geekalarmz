@@ -16,6 +16,7 @@
 
         </activity>
         <activity
+            android:launchMode="singleTask"
             android:name=".AlarmActivity"
             android:label="@string/title_activity_alarm" >
             <intent-filter>
