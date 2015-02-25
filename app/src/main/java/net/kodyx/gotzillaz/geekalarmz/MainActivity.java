@@ -2,16 +2,27 @@ package net.kodyx.gotzillaz.geekalarmz;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CheckBox;
+import android.widget.TextView;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    TextView mTimeTextView;
+    SwitchCompat mEnableSwitch;
+    CheckBox mVibrateCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mTimeTextView = (TextView) findViewById(R.id.text_time);
+        mEnableSwitch = (SwitchCompat) findViewById(R.id.switch_enable);
+        mVibrateCheckBox = (CheckBox) findViewById(R.id.checkbox_vibrate);
     }
 
 
