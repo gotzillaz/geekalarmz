@@ -4,8 +4,8 @@
     <string name="app_name">GeekAlarmZ</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
     <string name="default_time">00:00</string>
     <string name="vibrate">Vibrate</string>
+    <string name="title_activity_alarm">AlarmActivity</string>
 
 </resources>

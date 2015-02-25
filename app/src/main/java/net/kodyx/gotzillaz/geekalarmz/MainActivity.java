@@ -1,10 +1,14 @@
 package net.kodyx.gotzillaz.geekalarmz;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.SystemClock;
 import android.os.Vibrator;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -29,6 +33,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Context mContext;
     private TimePickerDialog mTimePickerDialog;
     private MediaPlayer mMediaPlayer;
+    private AlarmManager mAlarmManager;
+    private Intent intent;
+    private PendingIntent pendingIntent;
     public int hour = 0;
     public int minute = 0;
 
@@ -53,6 +60,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         mMediaPlayer = MediaPlayer.create(this, R.raw.massive_war_alarm);
         mMediaPlayer.setLooping(true);
+
+        mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        intent = new Intent(this, AlarmActivity.class);
+        pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mTimeTextView.setOnClickListener(this);
         mEnableSwitch.setOnCheckedChangeListener(this);
@@ -93,14 +104,17 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if(buttonView.getId() == R.id.switch_enable) {
             Toast.makeText(this, "SWITCH "+isChecked, Toast.LENGTH_SHORT).show();
             if(isChecked) {
-                mMediaPlayer.start();
-                Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-                // Vibrate for 500 milliseconds
-                v.vibrate(500);
+                mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000, pendingIntent);
+
+//                mMediaPlayer.start();
+//                Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+//                // Vibrate for 500 milliseconds
+//                v.vibrate(500);
             }
             else {
-                mMediaPlayer.pause();
-                mMediaPlayer.seekTo(0);
+                mAlarmManager.cancel(pendingIntent);
+//                mMediaPlayer.pause();
+//                mMediaPlayer.seekTo(0);
             }
         }
     }
