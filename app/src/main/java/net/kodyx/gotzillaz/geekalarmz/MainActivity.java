@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
@@ -12,20 +13,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
 
-
-public class MainActivity extends ActionBarActivity implements View.OnClickListener{
+public class MainActivity extends ActionBarActivity implements View.OnClickListener, SwitchCompat.OnCheckedChangeListener{
 
     private TextView mTimeTextView;
     private SwitchCompat mEnableSwitch;
     private CheckBox mVibrateCheckBox;
     private Context mContext;
     private TimePickerDialog mTimePickerDialog;
+    private MediaPlayer mMediaPlayer;
     public int hour = 0;
     public int minute = 0;
 
@@ -48,7 +50,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         mEnableSwitch = (SwitchCompat) findViewById(R.id.switch_enable);
         mVibrateCheckBox = (CheckBox) findViewById(R.id.checkbox_vibrate);
 
+        mMediaPlayer = MediaPlayer.create(this, R.raw.massive_war_alarm);
+        mMediaPlayer.setLooping(true);
+
         mTimeTextView.setOnClickListener(this);
+        mEnableSwitch.setOnCheckedChangeListener(this);
     }
 
     @Override
@@ -78,6 +84,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if(v.getId() == R.id.text_time) {
             DialogFragment newFragment = new TimePickerFragment(mTimeSetListener);
             newFragment.show(getFragmentManager(), "timePicker");
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(buttonView.getId() == R.id.switch_enable) {
+            Toast.makeText(this, "SWITCH "+isChecked, Toast.LENGTH_SHORT).show();
+            if(isChecked) {
+                mMediaPlayer.start();
+            }
+            else {
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+            }
         }
     }
 
