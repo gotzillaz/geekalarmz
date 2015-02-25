@@ -4,13 +4,33 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="net.kodyx.gotzillaz.geekalarmz.AlarmActivity">
+    tools:context="net.kodyx.gotzillaz.geekalarmz.AlarmActivity"
+    android:background="@color/accent_material_light">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <ImageView
+    <TextView
+        android:id="@+id/text_time"
+        android:text="@string/default_time"
+        android:textSize="@dimen/text_time_big_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_alarm_white_48dp"/>
+        android:textColor="@color/cardview_light_background"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/edit_text_answer"/>
+
+    <EditText
+        android:id="@+id/edit_text_answer"
+        android:inputType="text"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_centerVertical="true"
+        android:hint="@string/question"
+        android:background="@color/background_material_light" />
+
+    <Button
+        android:id="@+id/button_submit"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/submit"
+        android:layout_below="@+id/edit_text_answer"/>
 
 </RelativeLayout>

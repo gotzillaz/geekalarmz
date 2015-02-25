@@ -91,7 +91,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         minute = mSharedPreferences.getInt("minute", 0);
 
         mTimeTextView.setText(String.format("%02d:%02d", hour, minute));
-        mEnableSwitch.setChecked(getIntent().getBooleanExtra("isEnable",false));
+        mEnableSwitch.setChecked(getIntent().getBooleanExtra("isEnable",false) || mSharedPreferences.getBoolean("isEnable",false));
 
         mNotiManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -124,7 +124,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.text_time) {
-            DialogFragment newFragment = new TimePickerFragment(mTimeSetListener);
+            DialogFragment newFragment = new TimePickerFragment(mTimeSetListener, hour, minute);
             newFragment.show(getFragmentManager(), "timePicker");
         }
     }
@@ -139,6 +139,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 calendar.set(Calendar.HOUR_OF_DAY, hour);
                 calendar.set(Calendar.MINUTE, minute);
 
+                if(calendar.getTimeInMillis() < System.currentTimeMillis()) {
+                    calendar.setTimeInMillis(calendar.getTimeInMillis() + 1000 * 60 * 60 * 24);
+                }
+
                 mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                 Intent notiIntent = new Intent(this, MainActivity.class);
                 notiIntent.putExtra("isEnable", true);
@@ -151,6 +155,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 Notification notification = notiBuilder.build();
                 notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;;
                 mNotiManager.notify(0, notification);
+
+                mEditor = mSharedPreferences.edit();
+                mEditor.putBoolean("isEnable", true);
+                mEditor.apply();
+
 //                mMediaPlayer.start();
 //                Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
 //                // Vibrate for 500 milliseconds
@@ -159,6 +168,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             else {
                 mAlarmManager.cancel(pendingIntent);
                 mNotiManager.cancel(0);
+                mEditor = mSharedPreferences.edit();
+                mEditor.putBoolean("isEnable", false);
+                mEditor.apply();
 //                mMediaPlayer.pause();
 //                mMediaPlayer.seekTo(0);
             }
@@ -167,17 +179,21 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     public static class TimePickerFragment extends DialogFragment {
         TimePickerDialog.OnTimeSetListener listener;
+        int hour;
+        int minute;
 
-        public TimePickerFragment(TimePickerDialog.OnTimeSetListener listener) {
+        public TimePickerFragment(TimePickerDialog.OnTimeSetListener listener, int hour, int minute) {
             this.listener = listener;
+            this.hour = hour;
+            this.minute = minute;
         }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current time as the default values for the picker
             final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+//            hour = c.get(Calendar.HOUR_OF_DAY);
+//            minute = c.get(Calendar.MINUTE);
 
             // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this.listener, hour, minute,
