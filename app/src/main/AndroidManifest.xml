@@ -13,17 +13,17 @@
             android:launchMode="singleTop"
             android:name=".MainActivity"
             android:label="@string/app_name" >
-
-        </activity>
-        <activity
-            android:launchMode="singleTask"
-            android:name=".AlarmActivity"
-            android:label="@string/title_activity_alarm" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:launchMode="singleInstance"
+            android:name=".AlarmActivity"
+            android:label="@string/title_activity_alarm" >
+
         </activity>
     </application>
 

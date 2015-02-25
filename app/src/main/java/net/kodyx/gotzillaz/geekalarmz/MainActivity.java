@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener, SwitchCompat.OnCheckedChangeListener{
@@ -66,7 +67,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         boolean enableStatus = it.getBooleanExtra("isEnable", false);
         mEnableSwitch = (SwitchCompat) findViewById(R.id.switch_enable);
         mEnableSwitch.setChecked(enableStatus);
-        Log.d("enableStatus", enableStatus+"");
+        Log.d("enableStatus", enableStatus + "");
     }
 
     @Override
@@ -83,8 +84,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 //        mMediaPlayer.setLooping(true);
 
         mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        intent = new Intent(this, AlarmActivity.class);
-        pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mSharedPreferences = getSharedPreferences("alarm", Context.MODE_PRIVATE);
         hour = mSharedPreferences.getInt("hour", 0);
@@ -143,14 +142,22 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     calendar.setTimeInMillis(calendar.getTimeInMillis() + 1000 * 60 * 60 * 24);
                 }
 
+                String weekDay;
+                SimpleDateFormat dayFormat = new java.text.SimpleDateFormat("E");
+                weekDay = dayFormat.format(calendar.getTime());
+
+                intent = new Intent(this, AlarmActivity.class);
+                intent.putExtra("isVibrate", mVibrateCheckBox.isChecked());
+                pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
                 Intent notiIntent = new Intent(this, MainActivity.class);
                 notiIntent.putExtra("isEnable", true);
-                PendingIntent notiPendingIntent = PendingIntent.getActivity(this, 1, notiIntent, 0);
+                PendingIntent notiPendingIntent = PendingIntent.getActivity(this, 0, notiIntent, 0);
                 Notification.Builder notiBuilder = new Notification.Builder(this);
                 notiBuilder.setSmallIcon(R.drawable.ic_alarm_white_48dp)
                     .setContentTitle("Upcoming GeekAlarmZ")
-                    .setContentText(String.format("%02d:%02d", hour, minute))
+                    .setContentText(weekDay + " " + String.format("%02d:%02d", hour, minute))
                     .setContentIntent(notiPendingIntent);
                 Notification notification = notiBuilder.build();
                 notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;;
@@ -160,10 +167,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 mEditor.putBoolean("isEnable", true);
                 mEditor.apply();
 
-//                mMediaPlayer.start();
-//                Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-//                // Vibrate for 500 milliseconds
-//                v.vibrate(500);
             }
             else {
                 mAlarmManager.cancel(pendingIntent);
@@ -171,8 +174,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 mEditor = mSharedPreferences.edit();
                 mEditor.putBoolean("isEnable", false);
                 mEditor.apply();
-//                mMediaPlayer.pause();
-//                mMediaPlayer.seekTo(0);
             }
         }
     }
