@@ -31,6 +31,6 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:text="@string/submit"
-        android:layout_below="@+id/edit_text_answer"/>
+        android:layout_below="@+id/edit_text_answer" />
 
 </RelativeLayout>

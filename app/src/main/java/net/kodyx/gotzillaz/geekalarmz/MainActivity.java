@@ -137,6 +137,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 calendar.setTimeInMillis(System.currentTimeMillis());
                 calendar.set(Calendar.HOUR_OF_DAY, hour);
                 calendar.set(Calendar.MINUTE, minute);
+                calendar.set(Calendar.SECOND, 0);
 
                 if(calendar.getTimeInMillis() < System.currentTimeMillis()) {
                     calendar.setTimeInMillis(calendar.getTimeInMillis() + 1000 * 60 * 60 * 24);
